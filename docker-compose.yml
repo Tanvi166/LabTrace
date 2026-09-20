@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  labtrace-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/labtrace.db
+      - STORAGE_PROVIDER=local
+      - LOCAL_STORAGE_PATH=./data/storage
+    volumes:
+      - labtrace_data:/app/data
+
+volumes:
+  labtrace_data:
