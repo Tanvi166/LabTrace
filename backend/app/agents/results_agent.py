@@ -7,7 +7,9 @@ class ResultsAnalysisAgent(BaseAgent[ResultsAgentInput, ResultsAgentOutput]):
             name="Results Agent",
             description="Interprets CSV/JSON metric summaries and performance curves without recalculating numbers.",
             input_schema=ResultsAgentInput,
-            output_schema=ResultsAgentOutput
+            output_schema=ResultsAgentOutput,
+            azure_agent_name="LabTrace-Results-Agent",
+            azure_agent_version="2",
         )
 
     def _execute(self, input_data: ResultsAgentInput) -> ResultsAgentOutput:

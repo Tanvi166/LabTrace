@@ -1,52 +1,80 @@
 from app.agents.base import BaseAgent
 from app.agents.schemas import MetadataAgentInput, MetadataAgentOutput
 
-class MetadataAgent(BaseAgent[MetadataAgentInput, MetadataAgentOutput]):
+
+class MetadataAgent(
+    BaseAgent[MetadataAgentInput, MetadataAgentOutput]
+):
     def __init__(self):
         super().__init__(
+            
             name="Metadata Agent",
-            description="Analyzes environment, frameworks, and dependency metadata statically.",
+            description=(
+                "Analyzes environment, frameworks, dependencies, "
+                "hardware, and experiment metadata for reproducibility."
+            ),
             input_schema=MetadataAgentInput,
-            output_schema=MetadataAgentOutput
+            output_schema=MetadataAgentOutput,
+            azure_agent_name="LabTrace-Metadata-Agent",
+            azure_agent_version="2",
         )
 
-    def _execute(self, input_data: MetadataAgentInput) -> MetadataAgentOutput:
-        ma = input_data.metadata_a
-        mb = input_data.metadata_b
+    def _execute(
+        self,
+        input_data: MetadataAgentInput,
+    ) -> MetadataAgentOutput:
 
-        frameworks = ma.frameworks
-        py_ver = ma.python_version or "3.10"
-        
-        missing = []
-        if not ma.seeds:
-            missing.append("Random seeds (torch/np/random)")
-        if not ma.dependencies:
-            missing.append("Dependency manifest file")
-        if not ma.hyperparameters.learning_rate:
-            missing.append("Explicit learning_rate declaration")
+        metadata_a = input_data.metadata_a
+        metadata_b = input_data.metadata_b
 
-        diffs = []
-        if mb:
-            if ma.frameworks != mb.frameworks:
-                diffs.append(f"Framework change: {ma.frameworks} -> {mb.frameworks}")
-            if ma.dependencies != mb.dependencies:
-                diffs.append(f"Dependency differences detected: {len(ma.dependencies)} vs {len(mb.dependencies)} packages")
+        prompt = f"""
+Analyze the metadata of a machine learning experiment.
 
-        evidence = [
-            f"Detected {len(ma.imports)} python imports",
-            f"Detected {len(ma.seeds)} seed configuration calls",
-            f"Detected {len(ma.cuda_flags)} CUDA/GPU device flags"
-        ]
-        if input_data.mcp_metadata:
-            evidence.append("Experiment metadata verified through MCP.")
+Experiment A metadata:
+{metadata_a.model_dump()}
 
-        summary_text = f"Extracted environment metadata: Frameworks={', '.join(frameworks) if frameworks else 'Generic Python'}, Python={py_ver}."
+Experiment B metadata:
+{metadata_b.model_dump() if metadata_b else "No Experiment B provided."}
 
-        return MetadataAgentOutput(
-            summary=summary_text,
-            detected_frameworks=frameworks,
-            detected_environment=f"Python {py_ver}",
-            missing_metadata=missing,
-            important_differences=diffs,
-            evidence_notes=evidence
+Additional MCP metadata:
+{input_data.mcp_metadata}
+
+Analyze:
+
+1. Dataset details
+2. Python version and environment
+3. Frameworks and libraries
+4. Dependencies
+5. Hardware / CUDA information
+6. Model configuration and hyperparameters
+7. Random seed configuration
+8. Missing metadata
+9. Important differences between Experiment A and B
+10. Potential reproducibility implications
+
+Do not invent information.
+
+Only use evidence present in the supplied metadata.
+
+Return a structured metadata analysis.
+"""
+
+        system_prompt = """
+You are the LabTrace Metadata Agent.
+
+Your job is to analyze machine-learning experiment metadata.
+
+Use only the supplied evidence.
+Do not invent datasets, versions, hardware,
+dependencies, hyperparameters, or experiment facts.
+
+Identify missing information explicitly.
+
+Return concise, technically accurate structured output.
+"""
+
+        return self.provider.generate_structured(
+            prompt=prompt,
+            schema=MetadataAgentOutput,
+            system_prompt=system_prompt,
         )

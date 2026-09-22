@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str = "sqlite:///./labtrace.db"
-    AZURE_SQL_ENABLED: bool = False
+    AZURE_SQL_ENABLED: bool = True
     AZURE_SQL_SERVER: str = "labtrace-sql-3118.database.windows.net"
     AZURE_SQL_DATABASE: str = "labtrace-db"
     AZURE_SQL_DRIVER: str = "ODBC Driver 18 for SQL Server"

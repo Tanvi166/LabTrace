@@ -308,13 +308,28 @@ export const experimentApi = {
     const res = await api.get<ReportResponse>(`/reports/${id}`);
     return res.data;
   },
+  
   searchKnowledge: async (query: string, top_k = 5, mode = 'hybrid'): Promise<KnowledgeResult[]> => {
     const res = await api.post<{ results: KnowledgeResult[] }>('/rag/search', { query, top_k, mode }); return res.data.results;
+  },
+  chat: async (question: string): Promise<ChatResponse> => {
+  const res = await api.post<ChatResponse>('/chat', { question });
+  return res.data;
   },
   getRagStatus: async () => { const res = await api.get('/rag/status'); return res.data; },
   getMcpStatus: async () => { const res = await api.get('/mcp/status'); return res.data; },
   getMcpTools: async () => { const res = await api.get('/mcp/tools'); return res.data.tools; },
   getMcpCalls: async () => { const res = await api.get('/mcp/calls'); return res.data.calls; },
 };
+export interface ChatSource {
+  title: string;
+  chunk_id: string;
+  score: number;
+}
 
+export interface ChatResponse {
+  question: string;
+  answer: string;
+  sources: ChatSource[];
+}
 export default api;

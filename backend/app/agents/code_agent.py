@@ -1,47 +1,86 @@
 from app.agents.base import BaseAgent
 from app.agents.schemas import CodeAgentInput, CodeAgentOutput
 
-class CodeAnalysisAgent(BaseAgent[CodeAgentInput, CodeAgentOutput]):
+
+class CodeAnalysisAgent(
+    BaseAgent[CodeAgentInput, CodeAgentOutput]
+):
     def __init__(self):
         super().__init__(
             name="Code Analysis Agent",
-            description="Interprets AST function modifications, file changes, and parameter deltas.",
+            description=(
+                "Analyzes and compares implementation code, "
+                "configuration, dependencies, and AST changes "
+                "between machine learning experiments."
+            ),
             input_schema=CodeAgentInput,
-            output_schema=CodeAgentOutput
+            output_schema=CodeAgentOutput,
+            azure_agent_name="LabTrace-Code-Agent",
+            azure_agent_version="2",
         )
 
-    def _execute(self, input_data: CodeAgentInput) -> CodeAgentOutput:
-        code_changes = []
-        ast_funcs = []
-        cfg_changes = []
-        dep_changes = []
+    def _execute(
+        self,
+        input_data: CodeAgentInput,
+    ) -> CodeAgentOutput:
 
-        for f in input_data.file_diffs:
-            if f.change_type != "unchanged":
-                code_changes.append(f"File '{f.filename}' status: {f.change_type}")
-                for ast_f in f.ast_function_diffs:
-                    ast_funcs.append(f"Function '{ast_f.name}()' in {ast_f.file} was {ast_f.change_type}")
+        prompt = f"""
+Analyze the implementation and configuration differences
+between machine learning experiments.
 
-        for cfg in input_data.config_diffs:
-            if cfg.change_type != "unchanged":
-                cfg_changes.append(f"Parameter '{cfg.parameter}': {cfg.experiment_a} -> {cfg.experiment_b} ({cfg.change_type})")
+Code file differences:
+{[item.model_dump() for item in input_data.file_diffs]}
 
-        for dep in input_data.dependency_diffs:
-            if dep.change_type != "unchanged":
-                dep_changes.append(f"Package '{dep.package}': {dep.version_a} -> {dep.version_b} ({dep.change_type})")
+Configuration differences:
+{[item.model_dump() for item in input_data.config_diffs]}
 
-        interpretation_msg = (
-            f"Observed {len(code_changes)} file modifications and {len(ast_funcs)} AST function changes. "
-            "These configuration and AST changes represent structural pipeline variations between runs."
-        )
-        if input_data.mcp_files:
-            interpretation_msg += f" MCP inspected {len(input_data.mcp_files.get('files', []))} experiment files."
+Dependency differences:
+{[item.model_dump() for item in input_data.dependency_diffs]}
 
-        return CodeAgentOutput(
-            summary=f"Codebase analysis complete: {len(code_changes)} file diffs, {len(cfg_changes)} hyperparameter changes.",
-            observed_code_changes=code_changes or ["No file structural changes detected."],
-            ast_function_modifications=ast_funcs or ["No AST function definition changes detected."],
-            configuration_changes=cfg_changes or ["Configuration parameters identical."],
-            dependency_changes=dep_changes or ["Dependencies identical."],
-            interpretation=interpretation_msg
+Additional experiment files:
+{input_data.mcp_files}
+
+Relevant file contents:
+{input_data.mcp_file_contents}
+
+Analyze:
+
+1. Code implementation changes
+2. Function or AST changes
+3. Data loading and preprocessing changes
+4. Model architecture changes
+5. Training procedure changes
+6. Configuration and hyperparameter changes
+7. Dependency/version changes
+8. Changes that could affect experiment results
+9. Changes that could affect reproducibility
+10. Missing information
+
+Do not invent code changes or experiment facts.
+
+Only use the supplied evidence.
+
+Return a structured code analysis.
+"""
+
+        system_prompt = """
+You are the LabTrace Code Analysis Agent.
+
+Analyze machine-learning experiment implementation differences.
+
+Base every conclusion only on the supplied code,
+configuration, dependency, and file evidence.
+
+Do not invent files, functions, parameters,
+dependencies, or implementation details.
+
+Clearly distinguish observed changes from interpretation.
+
+Return concise, technically accurate structured output.
+"""
+
+        return self.provider.generate_structured(
+            prompt=prompt,
+            schema=CodeAgentOutput,
+            system_prompt=system_prompt,
         )

@@ -1,74 +1,80 @@
 from app.agents.base import BaseAgent
-from app.agents.schemas import ReproducibilityAgentInput, ReproducibilityAgentOutput, ReportFindingItem
+from app.agents.schemas import (
+    ReproducibilityAgentInput,
+    ReproducibilityAgentOutput,
+)
 
-class ReproducibilityAgent(BaseAgent[ReproducibilityAgentInput, ReproducibilityAgentOutput]):
+
+class ReproducibilityAgent(
+    BaseAgent[ReproducibilityAgentInput, ReproducibilityAgentOutput]
+):
     def __init__(self):
         super().__init__(
             name="Reproducibility Agent",
-            description="Explains deterministic reproducibility score and structures recommendations by severity.",
+            description=(
+                "Analyzes deterministic reproducibility findings using "
+                "the Azure AI Foundry Reproducibility Agent."
+            ),
             input_schema=ReproducibilityAgentInput,
-            output_schema=ReproducibilityAgentOutput
+            output_schema=ReproducibilityAgentOutput,
         )
 
-    def _execute(self, input_data: ReproducibilityAgentInput) -> ReproducibilityAgentOutput:
+    def _execute(
+        self,
+        input_data: ReproducibilityAgentInput,
+    ) -> ReproducibilityAgentOutput:
+
         eval_obj = input_data.evaluation
-        overall_score = eval_obj.overall_score
 
-        sev_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
-        recs = []
-        report_findings = []
+        findings_data = []
 
-        rand_audit = "Randomness controls missing"
-        dep_audit = "Dependency manifest unpinned"
-        env_audit = "Environment specified"
-        ds_audit = "Dataset referenced"
-        cfg_audit = "Config specified"
-        doc_audit = "Documentation present"
+        for finding in eval_obj.findings:
+            findings_data.append({
+                "title": finding.title,
+                "category": finding.category,
+                "severity": finding.severity,
+                "status": finding.status,
+                "evidence": finding.evidence,
+                "recommendation": finding.recommendation,
+            })
 
-        for f in eval_obj.findings:
-            if f.severity in sev_counts:
-                sev_counts[f.severity] += 1
-            if f.status != "PASSED":
-                recs.append(f"[{f.severity}] {f.recommendation}")
+        prompt = f"""
+Analyze the reproducibility findings for a machine learning experiment.
 
-            report_findings.append(ReportFindingItem(
-                title=f.title,
-                category=f.category,
-                severity=f.severity,
-                observed_evidence=f.evidence,
-                interpretation=(
-                    "This assessment is based on the deterministic reproducibility evaluation."
-                ),
-                recommendation=f.recommendation,
-            ))
+Deterministic reproducibility score:
+{eval_obj.overall_score}/100
 
-            if f.category == "randomness":
-                rand_audit = f"{f.title}: {f.evidence}"
-            elif f.category == "dependencies":
-                dep_audit = f"{f.title}: {f.evidence}"
-            elif f.category == "environment":
-                env_audit = f"{f.title}: {f.evidence}"
-            elif f.category == "dataset":
-                ds_audit = f"{f.title}: {f.evidence}"
-            elif f.category == "configuration":
-                cfg_audit = f"{f.title}: {f.evidence}"
-            elif f.category == "documentation":
-                doc_audit = f"{f.title}: {f.evidence}"
+Findings:
+{findings_data}
 
-        summary_text = f"Reproducibility score: {overall_score}/100. Evaluated {len(eval_obj.findings)} audit checks."
-        if input_data.mcp_findings:
-            summary_text += " Findings were verified through MCP."
+Additional MCP findings:
+{input_data.mcp_findings}
 
-        return ReproducibilityAgentOutput(
-            overall_score=overall_score,
-            summary=summary_text,
-            randomness_audit=rand_audit,
-            dependency_audit=dep_audit,
-            environment_audit=env_audit,
-            dataset_audit=ds_audit,
-            configuration_audit=cfg_audit,
-            documentation_audit=doc_audit,
-            severity_breakdown=sev_counts,
-            actionable_recommendations=recs or ["No failing deterministic reproducibility checks were identified."],
-            findings=report_findings,
+Return a structured reproducibility assessment.
+
+You must:
+1. Explain the reproducibility score.
+2. Analyze randomness, dependencies, environment, dataset,
+   configuration, and documentation.
+3. Identify important reproducibility issues.
+4. Give actionable recommendations.
+5. Preserve the evidence from the supplied findings.
+6. Do not invent experiment facts.
+"""
+
+        system_prompt = """
+You are the LabTrace Reproducibility Agent.
+
+Your job is to analyze machine-learning experiment reproducibility
+using the supplied deterministic findings and evidence.
+
+Do not invent evidence, experiment results, datasets, or configurations.
+Base your assessment only on the supplied information.
+Return concise, technically accurate structured output.
+"""
+
+        return self.provider.generate_structured(
+            prompt=prompt,
+            schema=ReproducibilityAgentOutput,
+            system_prompt=system_prompt,
         )

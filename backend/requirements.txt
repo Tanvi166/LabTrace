@@ -4,7 +4,9 @@ pydantic>=2.6.0
 pydantic-settings>=2.2.0
 sqlalchemy>=2.0.28
 alembic>=1.13.1
+
 # Required only when DATABASE_URL uses mssql+pyodbc for Azure SQL.
+
 pyodbc>=5.1.0
 pyjwt>=2.8.0
 passlib[bcrypt]>=1.7.4
