@@ -74,8 +74,8 @@ export const UploadPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Upload & Analyze Experiment</h1>
-        <p className="text-sm text-slate-500 mt-1">Upload research code, parameters, requirements, metrics CSVs, or ZIP archives.</p>
+        <h1 className="text-2xl font-bold text-white text-glow">Upload & Analyze Experiment</h1>
+        <p className="text-sm text-slate-400 mt-1">Upload research code, parameters, requirements, metrics CSVs, or ZIP archives.</p>
       </div>
 
       {uploadSuccess && createdExperiment ? (
@@ -104,55 +104,55 @@ export const UploadPage: React.FC = () => {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Metadata Section */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="font-semibold text-slate-900 text-md">1. Experiment Information</h3>
+          <div className="glass-panel p-6 space-y-4">
+            <h3 className="font-semibold text-white text-md">1. Experiment Information</h3>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Experiment Title *</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Experiment Title *</label>
               <input
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. PyTorch ResNet50 CIFAR-10 Baseline"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-black/20 border border-white/20 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-colors"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Description (Optional)</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Description (Optional)</label>
               <textarea
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Brief summary of model architecture, dataset, or seed settings..."
                 rows={2}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-black/20 border border-white/20 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Tags (Comma-separated)</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Tags (Comma-separated)</label>
               <input
                 type="text"
                 value={tagsStr}
                 onChange={e => setTagsStr(e.target.value)}
                 placeholder="vision, resnet, pytorch, cifar10"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-black/20 border border-white/20 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-colors"
               />
             </div>
           </div>
 
           {/* File Upload Zone */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="font-semibold text-slate-900 text-md">2. Upload Experiment Artifacts</h3>
+          <div className="glass-panel p-6 space-y-4">
+            <h3 className="font-semibold text-white text-md">2. Upload Experiment Artifacts</h3>
             
-            <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors relative bg-slate-50/50">
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-neon-cyan hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all relative bg-black/10">
               <input
                 type="file"
                 multiple
                 onChange={e => handleFileSelection(e.target.files)}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              <UploadCloud className="w-10 h-10 text-indigo-500 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-slate-800">Drag & Drop files or click to browse</p>
-              <p className="text-xs text-slate-500 mt-1">
+              <UploadCloud className="w-10 h-10 text-brand-400 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-slate-200">Drag & Drop files or click to browse</p>
+              <p className="text-xs text-slate-400 mt-1">
                 Supports .py, .ipynb, .csv, .json, .yaml, .toml, requirements.txt, and .zip archives
               </p>
             </div>
@@ -174,19 +174,19 @@ export const UploadPage: React.FC = () => {
             {/* Selected File List */}
             {selectedFiles.length > 0 && (
               <div className="space-y-2 pt-2">
-                <p className="text-xs font-medium text-slate-700 uppercase tracking-wider">Selected Files ({selectedFiles.length})</p>
-                <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg max-h-48 overflow-y-auto bg-slate-50">
+                <p className="text-xs font-medium text-slate-300 uppercase tracking-wider">Selected Files ({selectedFiles.length})</p>
+                <div className="divide-y divide-white/5 border border-white/10 rounded-lg max-h-48 overflow-y-auto bg-black/20">
                   {selectedFiles.map((file, idx) => (
                     <div key={idx} className="px-3 py-2 flex items-center justify-between text-xs">
                       <div className="flex items-center space-x-2 truncate">
-                        <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                        <span className="font-medium text-slate-800 truncate">{file.name}</span>
+                        <FileText className="w-4 h-4 text-neon-cyan flex-shrink-0" />
+                        <span className="font-medium text-white truncate">{file.name}</span>
                         <span className="text-slate-400">({(file.size / 1024).toFixed(1)} KB)</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
-                        className="text-slate-400 hover:text-red-500 p-1"
+                        className="text-slate-400 hover:text-red-400 p-1"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -200,7 +200,7 @@ export const UploadPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium text-sm rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2"
+            className="w-full py-3 bg-gradient-to-r from-neon-cyan to-brand-500 hover:from-neon-cyan/90 hover:to-brand-500/90 disabled:opacity-50 text-white font-semibold text-sm rounded-xl shadow-neon hover:shadow-neon-strong transition-all duration-300 flex items-center justify-center space-x-2"
           >
             {isSubmitting ? (
               <>

@@ -137,12 +137,12 @@ export const ExperimentDetailPage: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <Link to="/" className="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800 space-x-1 mb-1">
+          <Link to="/" className="inline-flex items-center text-xs text-brand-400 hover:text-neon-cyan space-x-1 mb-1 transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </Link>
           <div className="flex items-center space-x-3">
-            <h1 className="text-2xl font-bold text-slate-900">{experiment.title}</h1>
+            <h1 className="text-2xl font-bold text-white text-glow">{experiment.title}</h1>
             <span className={`px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${
               experiment.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
             }`}>

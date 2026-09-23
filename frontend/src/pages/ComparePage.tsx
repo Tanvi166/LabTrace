@@ -68,19 +68,19 @@ export const ComparePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Compare Experiments</h1>
-        <p className="text-sm text-slate-500 mt-1">Side-by-side AST code diffs, hyperparameter delta tables, and metric trajectory overlays.</p>
+        <h1 className="text-2xl font-bold text-white text-glow">Compare Experiments</h1>
+        <p className="text-sm text-slate-400 mt-1">Side-by-side AST code diffs, hyperparameter delta tables, and metric trajectory overlays.</p>
       </div>
 
       {/* Selectors */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+      <div className="glass-panel p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Experiment A (Base)</label>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Experiment A (Base)</label>
             <select
               value={expAId}
               onChange={e => setExpAId(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-black/20 border border-white/20 rounded-lg text-sm text-white focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan"
             >
               <option value="">-- Select Experiment A --</option>
               {experiments.map(e => (
@@ -90,11 +90,11 @@ export const ComparePage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Experiment B (Variant)</label>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Experiment B (Variant)</label>
             <select
               value={expBId}
               onChange={e => setExpBId(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-black/20 border border-white/20 rounded-lg text-sm text-white focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan"
             >
               <option value="">-- Select Experiment B --</option>
               {experiments.map(e => (

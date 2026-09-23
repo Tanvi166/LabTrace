@@ -26,14 +26,14 @@ const navItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col min-h-screen border-r border-slate-800">
-      <div className="p-6 border-b border-slate-800 flex items-center space-x-3">
-        <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-xl shadow-md shadow-indigo-500/30">
+    <aside className="w-64 glass-panel border-r-0 rounded-r-none flex flex-col min-h-screen relative z-10">
+      <div className="p-6 border-b border-white/10 flex items-center space-x-3">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center font-bold text-white text-xl shadow-neon">
           LT
         </div>
         <div>
-          <h1 className="font-semibold text-white tracking-wide text-lg">LabTrace</h1>
-          <p className="text-xs text-slate-400">AI Reproducibility Platform</p>
+          <h1 className="font-semibold text-white tracking-wide text-lg text-glow">LabTrace</h1>
+          <p className="text-xs text-brand-400">AI Reproducibility</p>
         </div>
       </div>
       <nav className="flex-1 p-4 space-y-1">
@@ -43,10 +43,10 @@ export const Sidebar: React.FC = () => {
             to={item.path}
             end={item.path === '/'}
             className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? 'bg-indigo-600/20 text-indigo-400 border-l-2 border-indigo-500'
-                  : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-brand-500/20 text-brand-400 shadow-[inset_4px_0_0_0_#3b82f6] shadow-neon'
+                  : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`
             }
           >
@@ -55,8 +55,8 @@ export const Sidebar: React.FC = () => {
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-        LabTrace v1.0.0 &bull; Local & Azure Ready
+      <div className="p-4 border-t border-white/10 text-xs text-slate-500 text-center">
+        LabTrace v1.0.0 &bull; Local & Azure
       </div>
     </aside>
   );
