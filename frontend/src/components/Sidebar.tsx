@@ -15,7 +15,6 @@ import {
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/upload', label: 'Upload & Analyze', icon: UploadCloud },
-  { path: '/experiments', label: 'Experiments', icon: FlaskConical },
   { path: '/compare', label: 'Compare Runs', icon: GitCompare },
   { path: '/rag', label: 'RAG Knowledge', icon: BookOpen },
   { path: '/workflows', label: 'Agent Workflows', icon: Workflow },

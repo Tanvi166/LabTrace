@@ -30,7 +30,6 @@ export const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/upload" element={<UploadPage />} />
-                  <Route path="/experiments" element={<DashboardPage />} />
                   <Route path="/experiments/:id" element={<ExperimentDetailPage />} />
                   <Route path="/compare" element={<ComparePage />} />
                   <Route path="/rag" element={<RagPage />} />
