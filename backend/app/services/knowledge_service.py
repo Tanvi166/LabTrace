@@ -40,15 +40,55 @@ class AzureEmbeddingProvider(EmbeddingProvider):
         self.deployment = settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT
     def embed(self, text: str) -> list[float]: return list(self.client.embeddings.create(model=self.deployment, input=text).data[0].embedding)
 
-def chunk_document(content: str, document_id: str, title: str, source: str, chunk_size: int = 900, overlap: int = 120) -> list[KnowledgeChunk]:
-    if chunk_size <= overlap: raise ValueError("chunk_size must exceed overlap")
-    words = re.findall(r"\S+", content); output = []; start = ordinal = 0
+def chunk_document(
+    content: str,
+    document_id: str,
+    title: str,
+    source: str,
+    chunk_size: int = 900,
+    overlap: int = 120,
+) -> list[KnowledgeChunk]:
+    if chunk_size <= overlap:
+        raise ValueError("chunk_size must exceed overlap")
+
+    words = re.findall(r"\S+", content)
+    output = []
+    start = ordinal = 0
+
+    # Azure AI Search document keys cannot contain "/".
+    safe_document_id = re.sub(r"[^A-Za-z0-9_=~-]", "_", document_id)
     while start < len(words):
-        end = start; length = 0
-        while end < len(words) and length + len(words[end]) + 1 <= chunk_size: length += len(words[end]) + 1; end += 1
-        end = max(end, start + 1); output.append(KnowledgeChunk(document_id, f"{document_id}-{ordinal}", title, source, " ".join(words[start:end]))); ordinal += 1
-        if end >= len(words): break
+        end = start
+        length = 0
+
+        while (
+            end < len(words)
+            and length + len(words[end]) + 1 <= chunk_size
+        ):
+            length += len(words[end]) + 1
+            end += 1
+
+        end = max(end, start + 1)
+
+        chunk_id = f"{safe_document_id}-{ordinal}"
+
+        output.append(
+            KnowledgeChunk(
+                document_id=document_id,
+                chunk_id=chunk_id,
+                title=title,
+                source=source,
+                content=" ".join(words[start:end]),
+            )
+        )
+
+        ordinal += 1
+
+        if end >= len(words):
+            break
+
         start = max(start + 1, end - max(1, overlap // 8))
+
     return output
 
 class KnowledgeProvider(ABC):
